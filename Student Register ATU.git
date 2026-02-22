@@ -1,84 +1,101 @@
 #include <iostream>
 #include <fstream>
-#include <sstream>
+#include <vector>
 using namespace std;
 
-// ---------- Add Test Students ----------
-void addTestStudents() {
-    ofstream file("students.txt"); // overwrite file to avoid duplicates
-    file << "Joseph,ATU001\n";
-    file << "Baanza,ATU002\n";
-    file << "Bright,ATU003\n";
+// ---------------- Student Class ----------------
+class Student {
+public:
+    string name;
+    string index;
+
+    Student(string n, string i) {
+        name = n;
+        index = i;
+    }
+};
+
+// Global student list
+vector<Student> students;
+
+// ---------------- Load Students ----------------
+void loadStudents() {
+    ifstream file("students.txt");
+    string name, index;
+
+    while (file >> index) {
+        file.ignore();
+        getline(file, name);
+        students.push_back(Student(name, index));
+    }
+    file.close();
+
+    // If file is empty, add test students
+    if (students.empty()) {
+        students.push_back(Student("Joseph", "EEE001"));
+        students.push_back(Student("Baanza", "EEE002"));
+        students.push_back(Student("Bright", "EEE003"));
+
+        ofstream out("students.txt");
+        for (auto &s : students) {
+            out << s.index << " " << s.name << endl;
+        }
+        out.close();
+    }
+}
+
+// ---------------- Save Students ----------------
+void saveStudents() {
+    ofstream file("students.txt");
+    for (auto &s : students) {
+        file << s.index << " " << s.name << endl;
+    }
     file.close();
 }
 
-// ---------- Register Student ----------
+// ---------------- Register Student ----------------
 void registerStudent() {
     string name, index;
-    ofstream file("students.txt", ios::app);
-
     cout << "Enter student name: ";
     cin.ignore();
     getline(cin, name);
-
     cout << "Enter index number: ";
-    getline(cin, index);
+    cin >> index;
 
-    file << name << "," << index << endl;
-    file.close();
+    students.push_back(Student(name, index));
+    saveStudents();
 
-    cout << "Student registered successfully!\n\n";
+    cout << "Student registered successfully!\n";
 }
 
-// ---------- View Students ----------
+// ---------------- View Students (SECOND LINE) ----------------
 void viewStudents() {
-    ifstream file("students.txt");
-    string line;
-
     cout << "\n--- Registered Students ---\n";
-    while (getline(file, line)) {
-        cout << line << endl;
+    for (auto &s : students) {
+        cout << s.index << " - " << s.name << endl;
     }
-    file.close();
-    cout << endl;
 }
 
-// ---------- Create Session ----------
-void createSession() {
-    cout << "Lecture session created successfully!\n\n";
-}
+// ---------------- Main Menu ----------------
+int main() {
+    loadStudents();
 
-// ---------- Search Student ----------
-void searchStudent() {
-    ifstream file("students.txt");
-    string line, searchIndex;
-    bool found = false;
+    int choice;
+    do {
+        cout << "\n==== DIGITAL ATTENDANCE SYSTEM ====\n";
+        cout << "1. Register Student\n";
+        cout << "2. View All Students\n";   // <-- SECOND LINE ADDED
+        cout << "0. Exit\n";
+        cout << "Choose: ";
+        cin >> choice;
 
-    cout << "Enter index number to search: ";
-    cin.ignore();
-    getline(cin, searchIndex);
-
-    while (getline(file, line)) {
-        string name, index;
-        stringstream ss(line);
-        getline(ss, name, ',');
-        getline(ss, index);
-
-        if (index == searchIndex) {
-            cout << "Student Found: " << name << " | " << index << endl;
-            found = true;
+        switch(choice) {
+            case 1: registerStudent(); break;
+            case 2: viewStudents(); break;
+            case 0: cout << "Exiting...\n"; break;
+            default: cout << "Invalid choice!\n";
         }
-    }
+    } while(choice != 0);
 
-    if (!found) {
-        cout << "Student not found.\n";
-    }
-
-    file.close();
-    cout << endl;
+    return 0;
 }
-
-// ---------- Mark Attendance ----------
-void markAttendance() {
-    string index, status;
-    ofstream file("attendance.txt",
