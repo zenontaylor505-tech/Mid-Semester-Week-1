@@ -18,6 +18,18 @@ public:
 // Global student list
 vector<Student> students;
 
+// ---------------- PRINT CSV FORMAT FOR EXCEL ----------------
+void printCSV() {
+    cout << "\n======= COPY BELOW INTO EXCEL =======\n";
+    cout << "Index Number,Student Name\n";
+
+    for (auto &s : students) {
+        cout << s.index << "," << s.name << "\n";
+    }
+
+    cout << "======= END COPY =======\n\n";
+}
+
 // ---------------- Load Students ----------------
 void loadStudents() {
     ifstream file("students.txt");
@@ -56,8 +68,9 @@ void saveStudents() {
 // ---------------- Register Student ----------------
 void registerStudent() {
     string name, index;
-    cout << "Enter student name: ";
+
     cin.ignore();
+    cout << "Enter student name: ";
     getline(cin, name);
     cout << "Enter index number: ";
     cin >> index;
@@ -68,7 +81,7 @@ void registerStudent() {
     cout << "Student registered successfully!\n";
 }
 
-// ---------------- View Students (SECOND LINE) ----------------
+// ---------------- View Students ----------------
 void viewStudents() {
     cout << "\n--- Registered Students ---\n";
     for (auto &s : students) {
@@ -84,7 +97,8 @@ int main() {
     do {
         cout << "\n==== DIGITAL ATTENDANCE SYSTEM ====\n";
         cout << "1. Register Student\n";
-        cout << "2. View All Students\n";   // <-- SECOND LINE ADDED
+        cout << "2. View All Students\n";
+        cout << "3. Export to Excel (CSV Format)\n";
         cout << "0. Exit\n";
         cout << "Choose: ";
         cin >> choice;
@@ -92,6 +106,7 @@ int main() {
         switch(choice) {
             case 1: registerStudent(); break;
             case 2: viewStudents(); break;
+            case 3: printCSV(); break;
             case 0: cout << "Exiting...\n"; break;
             default: cout << "Invalid choice!\n";
         }
